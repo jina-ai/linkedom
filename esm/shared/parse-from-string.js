@@ -3,6 +3,7 @@ import * as HTMLParser2 from 'htmlparser2';
 import {ELEMENT_NODE, SVG_NAMESPACE} from './constants.js';
 import {CUSTOM_ELEMENTS, PREV, END, VALUE} from './symbols.js';
 import {keys} from './object.js';
+import {HTMLTokenizer} from './html-tokenizer.js';
 
 import {knownBoundaries, knownSiblings} from './utils.js';
 import {attributeChangedCallback, connectedCallback} from '../interface/custom-element-registry.js';
@@ -110,7 +111,8 @@ export const parseFromString = (document, isHTML, markupLanguage) => {
   }, {
     lowerCaseAttributeNames: false,
     decodeEntities: true,
-    xmlMode: !isHTML
+    xmlMode: !isHTML,
+    Tokenizer: isHTML ? HTMLTokenizer : undefined
   });
 
   content.write(markupLanguage);

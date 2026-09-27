@@ -4,6 +4,7 @@ const HTMLParser2 = require('htmlparser2');
 const {ELEMENT_NODE, SVG_NAMESPACE} = require('./constants.js');
 const {CUSTOM_ELEMENTS, PREV, END, VALUE} = require('./symbols.js');
 const {keys} = require('./object.js');
+const {HTMLTokenizer} = require('./html-tokenizer.js');
 
 const {knownBoundaries, knownSiblings} = require('./utils.js');
 const {attributeChangedCallback, connectedCallback} = require('../interface/custom-element-registry.js');
@@ -112,7 +113,8 @@ const parseFromString = (document, isHTML, markupLanguage) => {
   }, {
     lowerCaseAttributeNames: false,
     decodeEntities: true,
-    xmlMode: !isHTML
+    xmlMode: !isHTML,
+    Tokenizer: isHTML ? HTMLTokenizer : undefined
   });
 
   content.write(markupLanguage);

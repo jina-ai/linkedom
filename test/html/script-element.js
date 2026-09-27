@@ -154,3 +154,25 @@ assert(head.firstChild.innerHTML, 'html`<p>ok</p>`;', '<script>.innerHTML');
   const { document } = parseHTML('<html><script>const test = "$$ $& $1"</script></html>');
   assert(document.toString(), '<html><script>const test = "$$ $& $1"</script></html>')
 }
+
+{
+  // script data (double) escaped states: `<!--` + `<script>` keeps `</script>` as text
+  const code = 'var c="<!--";e.exports=function(e,t){return{code:"<script>\\n"+t+"\\n</script>",promise:n.resolve()}}';
+  const { document } = parseHTML(`<html><head><script>${code}</script></head><body><p>after</p></body></html>`);
+  const [script, ...rest] = document.querySelectorAll('script');
+  assert(rest.length, 0, 'double escaped script: single script');
+  assert(script.textContent, code, 'double escaped script: text content');
+  assert(document.body.innerHTML, '<p>after</p>', 'double escaped script: body');
+}
+
+{
+  const { document } = parseHTML('<html><script><!-- <script></script> --></script><p>ok</p></html>');
+  assert(document.querySelector('script').textContent, '<!-- <script></script> -->', 'double escaped script: comment');
+  assert(document.querySelector('p').textContent, 'ok', 'double escaped script: following content');
+}
+
+{
+  // without `<!--` the first `</script>` still ends the script, as in browsers
+  const { document } = parseHTML('<html><script>a="<script>";b="</script>";</script></html>');
+  assert(document.querySelector('script').textContent, 'a="<script>";b="', 'non escaped script: first end tag wins');
+}
